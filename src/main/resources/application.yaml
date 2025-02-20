@@ -1,0 +1,84 @@
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty.http.client: DEBUG
+    org.springframework.cloud.consul: DEBUG
+spring:
+  main:
+    web-application-type: reactive
+    allow-bean-definition-overriding: true
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: ${APPLICATION_NAME}
+  cloud:
+    consul:
+      enabled: true
+      host: ${CONSUL_HOST}
+      port: ${CONSUL_PORT}
+      discovery:
+        healthCheckPath: /actuator/health
+        scheme: http
+        prefer-ip-address: true
+        health-check-interval: 10s
+        service-name: ${CONSUL_SERVICE_NAME}
+        health-check-url: /actuator/health
+        enabled: true
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+  jackson:
+    serialization:
+      write-durations-as-timestamps: false
+  mail:
+    host: localhost
+  messages:
+    basename: i18n/messages
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${KEYCLOAK_ISSUER_URI}
+        registration:
+          oidc:
+            client-id: internal
+            client-secret: internal
+            scope: openid, profile, email, offline_access # last one for refresh tokens
+
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI}
+          principal-claim-name: preferred_username
+          audiences:
+            - account
+
+server:
+  port: ${SERVER_PORT}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  security:
+    oauth2:
+      enabled: false
+  endpoint:
+    health:
+      show-details: never
+
+application:
+  keycloak:
+    realm: zaytun
+    client-id: microservice
+    client-secret: 1nzGR5YazrSgGXdltO7Wcac741t9GFmO
+    username: admin
+    password: admin123
+    grant-type: password
+    scope: openid
+    server-url: http://localhost:9080
+    token-url: /realms/zaytun/protocol/openid-connect/token
+    refresh-grant-type: refresh_token

@@ -1,0 +1,23 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: zaytun-gateway
+  cloud:
+    consul:
+      host: http://localhost
+      port: 8500
+      discovery:
+        healthCheckPath: /actuator/health
+        prefer-ip-address: true
+        instance-id: ${spring.application.name}:${spring.profiles.active}:${server.port}
+        service-name: ${spring.application.name}
+        catalog-services-watch-delay: 5000
+        catalog-services-watch-timeout: 5
+      config:
+        watch:
+          enabled: true
+        fail-fast: true # if not in "prod" profile, do not force to use Spring Cloud Config
+        format: yaml
+        profile-separator: '-'
+        enabled: true
